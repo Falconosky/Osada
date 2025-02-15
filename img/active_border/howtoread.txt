@@ -1,0 +1,12 @@
+the file name refers to the occupancy of fields around a given field
+
+A B C
+D E F
+G H I
+
+where:
+field E - current field
+rest letters can be 0/1
+where:
+1 - current player's field
+0 - another player's field/ nobody's field

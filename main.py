@@ -33,6 +33,7 @@ class Map:
     menu_is_open = False
     menu_button_hover = []
     menu_button_highlighted = [False, False, False]
+    menu_submenu = 1
     camera_x = 0
     camera_y = 0
     camera_zoom = 1.0
@@ -182,24 +183,28 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  # Left mouse button
                     mouse_pos = pygame.mouse.get_pos()
+                    if map.menu_is_open:
+                        for i in range(len(map.menu_button_hover)):
+                            if map.menu_button_hover[i].collidepoint(mouse_pos):
+                                map.menu_submenu = i+1
+                    else:
+                        if map.end_turn_event.collidepoint(mouse_pos):
+                            end_turn(map)
 
-                    if map.end_turn_event.collidepoint(mouse_pos):
-                        end_turn(map)
+                        #   Sprawdź, czy miejsce kliknięcia myszy koliduje z którymś z obszarów w grid_event
+                        for i in range(len(map.grid_event)):
+                            for j in range(len(map.grid_event[i])):
+                                if map.grid_event[i][j].collidepoint(mouse_pos) and map.field_owner[i][j] == map.turn and \
+                                        map.field_type[i][j] == 'tr':
+                                    map.field_type[i][j] = 'gr'
+                                    map.players[map.turn - 1].wood += 1
 
-                    #   Sprawdź, czy miejsce kliknięcia myszy koliduje z którymś z obszarów w grid_event
-                    for i in range(len(map.grid_event)):
-                        for j in range(len(map.grid_event[i])):
-                            if map.grid_event[i][j].collidepoint(mouse_pos) and map.field_owner[i][j] == map.turn and \
-                                    map.field_type[i][j] == 'tr':
-                                map.field_type[i][j] = 'gr'
-                                map.players[map.turn - 1].wood += 1
-
-                            if (map.grid_event[i][j].collidepoint(mouse_pos) and map.expand_left > 0 and
-                                    map.field_owner[i][j] == 0):
-                                if (map.field_owner[i - 1][j] == map.turn or map.field_owner[i + 1][j] == map.turn or
-                                        map.field_owner[i][j - 1] == map.turn or map.field_owner[i][j + 1] == map.turn):
-                                    map.field_owner[i][j] = int(map.turn)
-                                    map.expand_left -= 1
+                                if (map.grid_event[i][j].collidepoint(mouse_pos) and map.expand_left > 0 and
+                                        map.field_owner[i][j] == 0):
+                                    if (map.field_owner[i - 1][j] == map.turn or map.field_owner[i + 1][j] == map.turn or
+                                            map.field_owner[i][j - 1] == map.turn or map.field_owner[i][j + 1] == map.turn):
+                                        map.field_owner[i][j] = int(map.turn)
+                                        map.expand_left -= 1
 
                     map_update(map)
                 if event.button == 4:  # Scroll up
@@ -216,6 +221,7 @@ def main():
                     map_update(map)
                 elif not map.menu_event_open.collidepoint(mouse_pos) and map.menu_is_open:
                     map.menu_is_open = False
+                    map.menu_submenu = 0
                     map_update(map)
 
                 if map.menu_is_open:

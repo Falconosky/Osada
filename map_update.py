@@ -205,51 +205,21 @@ def map_update(map):
             turn_img = pygame.image.load("img/blueTurn.png")
         elif map.turn == 2:
             turn_img = pygame.image.load("img/reedTurn.png")
+
         menu_top_position += (menu_top_position * 2) + (menu_top_position / 4)
-        menu_left_position = map.window.get_width() - menu_img_p2.get_width() + end_turn_img.get_width()/2
+        menu_left_position = map.window.get_width() - menu_img_p2.get_width() + end_turn_img.get_width() / 2
         if map.turn == 1:
             map.window.blit(menu_img_p1, (menu_left_position, menu_top_position))
         elif map.turn == 2:
             map.window.blit(menu_img_p2, (menu_left_position, menu_top_position))
         map.menu_event_open = pygame.Rect(menu_left_position, menu_top_position,
                                           menu_img_p2.get_width(), menu_img_p2.get_height())
+
+        map.window.blit(turn_img, (map.window.get_width() - menu_img_p2.get_width() + end_turn_img.get_width() / 2 +
+                                   adjust_x, menu_top_position + menu_img_p2.get_height() - adjust_y))
+
         menu_top_position2 = menu_top_position + 130
         menu_left_position2 = menu_left_position + (menu_img_p2.get_width() - menu_buildings_button_img.get_width()) / 2
-        map.window.blit(menu_buildings_button_img, (menu_left_position2, menu_top_position2))
-        button_react = pygame.Rect(menu_left_position2, menu_top_position2,
-                                   menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
-        if len(map.menu_button_hover) == 0:
-            map.menu_button_hover.append(button_react)
-        else:
-            map.menu_button_hover[0] = button_react
-
-        menu_top_position3 = menu_top_position2 + menu_buildings_button_img.get_height() + 3*7
-        map.window.blit(menu_recrutation_button_img, (menu_left_position2, menu_top_position3))
-        button_react = pygame.Rect(menu_left_position2, menu_top_position3,
-                                   menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
-        if len(map.menu_button_hover) == 1:
-            map.menu_button_hover.append(button_react)
-        else:
-            map.menu_button_hover[1] = button_react
-
-        menu_top_position4 = menu_top_position3 + menu_top_position3 - menu_top_position2
-        map.window.blit(menu_technology_button_img, (menu_left_position2, menu_top_position4))
-        button_react = pygame.Rect(menu_left_position2, menu_top_position4,
-                                   menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
-        if len(map.menu_button_hover) == 2:
-            map.menu_button_hover.append(button_react)
-        else:
-            map.menu_button_hover[2] = button_react
-
-        if map.menu_button_highlighted[0]:
-            map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position2))
-        elif map.menu_button_highlighted[1]:
-            map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position3))
-        elif map.menu_button_highlighted[2]:
-            map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position4))
-
-        map.window.blit(turn_img, (map.window.get_width() - menu_img_p2.get_width() + end_turn_img.get_width()/2 +
-                                   adjust_x, menu_top_position + menu_img_p2.get_height() - adjust_y))
 
         #   resources in menu
         left_position = 70
@@ -258,10 +228,8 @@ def map_update(map):
         player = None
 
         if map.turn == 1:
-            turn_img = pygame.image.load("img/blueTurn.png")
             player = map.players[0]
         elif map.turn == 2:
-            turn_img = pygame.image.load("img/reedTurn.png")
             player = map.players[1]
 
         resource_wood = player.wood
@@ -273,27 +241,72 @@ def map_update(map):
                                             menu_top_position + adjust_y))
         resource_number_display(map, resource_wood, map.window.get_width() - menu_img_p2.get_width() + left_position,
                                 menu_top_position + adjust_y)
+
         left_position += resource_wood_img.get_width() + adjust_x
         map.window.blit(resource_iron_img, (map.window.get_width() - menu_img_p2.get_width() + left_position,
                                             menu_top_position + adjust_y))
         resource_number_display(map, resource_iron, map.window.get_width() - menu_img_p2.get_width() + left_position,
                                 menu_top_position + adjust_y)
+
         left_position += resource_wood_img.get_width() + adjust_x
         map.window.blit(resource_stone_img, (map.window.get_width() - menu_img_p2.get_width() + left_position,
-                                            menu_top_position + adjust_y))
+                                             menu_top_position + adjust_y))
         resource_number_display(map, resource_stone, map.window.get_width() - menu_img_p2.get_width() + left_position,
                                 menu_top_position + adjust_y)
+
         left_position += resource_wood_img.get_width() + adjust_x
         map.window.blit(resource_pop_img, (map.window.get_width() - menu_img_p2.get_width() + left_position,
-                                            menu_top_position + adjust_y))
+                                           menu_top_position + adjust_y))
         resource_number_display(map, resource_pop, map.window.get_width() - menu_img_p2.get_width() + left_position,
                                 menu_top_position + adjust_y)
+
         left_position += resource_wood_img.get_width() + adjust_x
         map.window.blit(resource_research_img, (map.window.get_width() - menu_img_p2.get_width() + left_position,
-                                            menu_top_position + adjust_y))
-        resource_number_display(map, resource_research, map.window.get_width() - menu_img_p2.get_width() + left_position,
+                                                menu_top_position + adjust_y))
+        resource_number_display(map, resource_research,
+                                map.window.get_width() - menu_img_p2.get_width() + left_position,
                                 menu_top_position + adjust_y)
-        menu_top_position += menu_img_p2.get_height()
+
+        if map.menu_submenu == 0:
+            map.window.blit(menu_buildings_button_img, (menu_left_position2, menu_top_position2))
+            button_react = pygame.Rect(menu_left_position2, menu_top_position2,
+                                       menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
+            if len(map.menu_button_hover) == 0:
+                map.menu_button_hover.append(button_react)
+            else:
+                map.menu_button_hover[0] = button_react
+
+            menu_top_position3 = menu_top_position2 + menu_buildings_button_img.get_height() + 3*7
+            map.window.blit(menu_recrutation_button_img, (menu_left_position2, menu_top_position3))
+            button_react = pygame.Rect(menu_left_position2, menu_top_position3,
+                                       menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
+            if len(map.menu_button_hover) == 1:
+                map.menu_button_hover.append(button_react)
+            else:
+                map.menu_button_hover[1] = button_react
+
+            menu_top_position4 = menu_top_position3 + menu_top_position3 - menu_top_position2
+            map.window.blit(menu_technology_button_img, (menu_left_position2, menu_top_position4))
+            button_react = pygame.Rect(menu_left_position2, menu_top_position4,
+                                       menu_buildings_button_img.get_width(), menu_buildings_button_img.get_height())
+            if len(map.menu_button_hover) == 2:
+                map.menu_button_hover.append(button_react)
+            else:
+                map.menu_button_hover[2] = button_react
+
+            if map.menu_button_highlighted[0]:
+                map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position2))
+            elif map.menu_button_highlighted[1]:
+                map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position3))
+            elif map.menu_button_highlighted[2]:
+                map.window.blit(menu_button_highlight, (menu_left_position2, menu_top_position4))
+
+            menu_top_position += menu_img_p2.get_height()
+
+        elif map.menu_submenu == 1:
+            # TODO poprawić podświetlenia guzików miedzy menu
+            menu_buildings_dom = pygame.image.load("img/menu/budynki/dom.png")
+            map.window.blit(menu_buildings_dom, (menu_left_position2, menu_top_position2))
 
     # if map.turn == 1:
     #     menu_top_position += (menu_top_position * 2) + (menu_top_position / 4)
@@ -307,7 +320,8 @@ def map_update(map):
     #     arrow_turn = pygame.image.load("img/p2_menuarrow.png")
     #     map.window.blit(arrow_turn, (map.window.get_width()-arrow_turn.get_width(), menu_top_position))
     #     menu_top_position += arrow_turn.get_height()
-    menu_top_position += end_turn_img.get_height()/8
+    x, y = map.menu_event_open.bottomleft
+    menu_top_position = y + end_turn_img.get_height()/8
     map.window.blit(end_turn_img, (map.window.get_width()-end_turn_img.get_width(), menu_top_position))
 
     #   guziki

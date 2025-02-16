@@ -1,2 +1,7 @@
-# created by virtualenv automatically
+# Ignorowanie wirtualnego środowiska
+venv/
 
+# Ignorowanie folderów cache Pythona
+__pycache__/
+*.pyc
+*.pyo

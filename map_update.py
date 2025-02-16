@@ -11,22 +11,39 @@ def highlight_borders(map, x, y):
     corner_left_bottom = pygame.image.load("img/active_border/c_lb.png")
     corner_right_top = pygame.image.load("img/active_border/c_rt.png")
     corner_right_bottom = pygame.image.load("img/active_border/c_rb.png")
+    new_width = int(grass_img.get_width() * map.camera_zoom)
     if map.field_owner[x-1][y] != map.turn:
-        map.window.blit(line_left, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(line_left, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x+1][y] != map.turn:
-        map.window.blit(line_right, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(line_right, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x][y-1] != map.turn:
-        map.window.blit(line_top, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(line_top, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x][y+1] != map.turn:
-        map.window.blit(line_bottom, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(line_bottom, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x-1][y] == map.turn and map.field_owner[x][y-1] == map.turn and map.field_owner[x-1][y-1] != map.turn:
-        map.window.blit(corner_left_top, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(corner_left_top, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x+1][y] == map.turn and map.field_owner[x][y-1] == map.turn and map.field_owner[x+1][y-1] != map.turn:
-        map.window.blit(corner_right_top, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(corner_right_top, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x-1][y] == map.turn and map.field_owner[x][y+1] == map.turn and map.field_owner[x-1][y+1] != map.turn:
-        map.window.blit(corner_left_bottom, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(corner_left_bottom, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
     if map.field_owner[x+1][y] == map.turn and map.field_owner[x][y+1] == map.turn and map.field_owner[x+1][y+1] != map.turn:
-        map.window.blit(corner_right_bottom, (x * grass_img.get_width(), y * grass_img.get_width()))
+        scaled_hightlight = pygame.transform.scale(corner_right_bottom, (new_width, new_width))
+        map.window.blit(scaled_hightlight, (x * new_width + map.camera_x * new_width,
+                                            y * new_width + map.camera_y * new_width))
 
 def show_number(map, number, top_position, left_position):
     number_img = None
@@ -95,33 +112,55 @@ def map_update(map):
     for i in range(map.window_size_height):
         for j in range(map.window_size_width):
             #   grass
-            map.window.blit(grass_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+
+            new_width = int(grass_img.get_width() * map.camera_zoom)
+            scaled_grass = pygame.transform.smoothscale(grass_img, (new_width, new_width))
+            map.window.blit(scaled_grass, (j * new_width + map.camera_x * new_width,
+                                           i * new_width + map.camera_y * new_width))
+
             #   water
             if map.field_type[j][i] == 'wa':
-                map.window.blit(water_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_water = pygame.transform.scale(water_img, (new_width, new_width))
+                map.window.blit(scaled_water, (j * new_width + map.camera_x * new_width,
+                                               i * new_width + map.camera_y * new_width))
             #   trees
             elif map.field_type[j][i] == 'tr':
-                map.window.blit(tree_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_tree = pygame.transform.scale(tree_img, (new_width, new_width))
+                map.window.blit(scaled_tree, (j * new_width + map.camera_x * new_width,
+                                              i * new_width + map.camera_y * new_width))
             #   mountains
             elif map.field_type[j][i] == 'mo':
-                map.window.blit(mountain_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_mountain = pygame.transform.scale(mountain_img, (new_width, new_width))
+                map.window.blit(scaled_mountain, (j * new_width + map.camera_x * new_width,
+                                                  i * new_width + map.camera_y * new_width))
             #   iron ore
             elif map.field_type[j][i] == 'ir':
-                map.window.blit(iron_ore_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_iron = pygame.transform.scale(iron_ore_img, (new_width, new_width))
+                map.window.blit(scaled_iron, (j * new_width + map.camera_x * new_width,
+                                              i * new_width + map.camera_y * new_width))
 
     for i in range(map.window_size_height):
         for j in range(map.window_size_width):
+            new_width = int(grass_img.get_width() * map.camera_zoom)
             #   player1
             if map.field_owner[j][i] == 1:
-                map.window.blit(p1_field_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_field = pygame.transform.scale(p1_field_img, (new_width, new_width))
+                map.window.blit(scaled_field, (j * new_width + map.camera_x * new_width,
+                                               i * new_width + map.camera_y * new_width))
             #   player2
             elif map.field_owner[j][i] == 2:
-                map.window.blit(p2_field_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_field = pygame.transform.scale(p2_field_img, (new_width, new_width))
+                map.window.blit(scaled_field, (j * new_width + map.camera_x * new_width,
+                                               i * new_width + map.camera_y * new_width))
 
             if map.field_type[j][i] == 'ca':
-                map.window.blit(capitol_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+                scaled_capitol = pygame.transform.scale(capitol_img, (new_width, new_width))
+                map.window.blit(scaled_capitol, (j * new_width + map.camera_x * new_width,
+                                                 i * new_width + map.camera_y * new_width))
 
-            map.window.blit(grid_img, (j * grass_img.get_width(), i * grass_img.get_width()))
+            scaled_grid = pygame.transform.scale(grid_img, (new_width, new_width))
+            map.window.blit(scaled_grid, (j * new_width + map.camera_x * new_width,
+                                          i * new_width + map.camera_y * new_width))
             if map.field_owner[j][i] == map.turn:
                 highlight_borders(map, j, i)
 

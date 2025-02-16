@@ -24,6 +24,7 @@ class Map:
     window_size_height = 0
     number_of_players = 2
     window = pygame.display.set_mode((1280, 720))
+    #window = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     turn = 1
     expand_left = 1
     action = 1
@@ -32,6 +33,12 @@ class Map:
     menu_is_open = False
     menu_button_hover = []
     menu_button_highlighted = [False, False, False]
+    camera_x = 0
+    camera_y = 0
+    camera_zoom = 1.0
+    move_speed = 1.0
+    map_width = 0
+    map_height = 0
 
     def __init__(self):
         grid = pygame.image.load("img/empty.png")
@@ -44,6 +51,9 @@ class Map:
             window_size_width_px += 25
             self.window_size_width += 1
         self.window = pygame.display.set_mode((window_size_width_px, window_size_height_px))
+
+        self.map_width = self.window_size_width
+        self.map_height = self.window_size_height
 
         #   Przygotowanie i zapelnienie tablicy o polach mapy
         for i in range(int(self.window_size_width)):
@@ -98,6 +108,46 @@ def end_turn(map):
     map.window.fill((0, 0, 0))
     map_update(map)
 
+def handle_zoom_event(map, event):
+    mouse_x_pos, mouse_y_pos = pygame.mouse.get_pos()
+    grid = pygame.image.load("img/empty.png")
+
+    width = int(grid.get_width() * map.camera_zoom)
+    mouse_x_pixels = mouse_x_pos - mouse_x_pos % width
+    mouse_y_pixels = mouse_y_pos - mouse_y_pos % width
+
+    mouse_x = int(mouse_x_pixels / width)
+    mouse_y = int(mouse_y_pixels / width)
+
+    if event.button == 4:  # Scroll up
+        map.camera_zoom += 0.1
+    elif event.button == 5:  # Scroll down
+        map.camera_zoom -= 0.1
+
+    width = int(grid.get_width() * map.camera_zoom)
+
+    mouse_x_pixels = mouse_x_pos - mouse_x_pos % width
+    mouse_y_pixels = mouse_y_pos - mouse_y_pos % width
+
+    new_mouse_x = int(mouse_x_pixels / width)
+    new_mouse_y = int(mouse_y_pixels / width)
+    map.camera_x = map.camera_x + new_mouse_x - mouse_x
+    map.camera_y = map.camera_y + new_mouse_y - mouse_y
+
+    map_update(map)
+    new_scaled_grid_events(map)
+
+def new_scaled_grid_events(map):
+    grid = pygame.image.load("img/empty.png")
+    new_width = int(grid.get_width() * map.camera_zoom)
+    map.grid_event = []
+    for i in range(int(map.map_width)):
+        tab3 = []
+        for j in range(int(map.map_height)):
+            tab3.append(pygame.Rect(i * new_width + map.camera_x * new_width,
+                                    j * new_width + map.camera_y * new_width, new_width, new_width))
+        map.grid_event.append(tab3)
+
 def main():
     run = True
 
@@ -113,27 +163,50 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     end_turn(map)
+                elif event.key == pygame.K_a:
+                    map.camera_x += 1
+                    map_update(map)
+                    new_scaled_grid_events(map)
+                elif event.key == pygame.K_d:
+                    map.camera_x -= 1
+                    map_update(map)
+                    new_scaled_grid_events(map)
+                elif event.key == pygame.K_w:
+                    map.camera_y += 1
+                    map_update(map)
+                    new_scaled_grid_events(map)
+                elif event.key == pygame.K_s:
+                    map.camera_y -= 1
+                    map_update(map)
+                    new_scaled_grid_events(map)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
+                if event.button == 1:  # Left mouse button
+                    mouse_pos = pygame.mouse.get_pos()
 
-                if map.end_turn_event.collidepoint(mouse_pos):
-                    end_turn(map)
+                    if map.end_turn_event.collidepoint(mouse_pos):
+                        end_turn(map)
 
-                #   Sprawdź, czy miejsce kliknięcia myszy koliduje z którymś z obszarów w grid_event
-                for i in range(len(map.grid_event)):
-                    for j in range(len(map.grid_event[i])):
-                        if map.grid_event[i][j].collidepoint(mouse_pos) and map.field_owner[i][j] == map.turn and map.field_type[i][j] == 'tr':
-                            map.field_type[i][j] = 'gr'
-                            map.players[map.turn-1].wood += 1
+                    #   Sprawdź, czy miejsce kliknięcia myszy koliduje z którymś z obszarów w grid_event
+                    for i in range(len(map.grid_event)):
+                        for j in range(len(map.grid_event[i])):
+                            if map.grid_event[i][j].collidepoint(mouse_pos) and map.field_owner[i][j] == map.turn and \
+                                    map.field_type[i][j] == 'tr':
+                                map.field_type[i][j] = 'gr'
+                                map.players[map.turn - 1].wood += 1
 
-                        if (map.grid_event[i][j].collidepoint(mouse_pos) and map.expand_left > 0 and
-                                map.field_owner[i][j] == 0):
-                            if (map.field_owner[i-1][j] == map.turn or map.field_owner[i+1][j] == map.turn or
-                                    map.field_owner[i][j-1] == map.turn or map.field_owner[i][j+1] == map.turn):
-                                map.field_owner[i][j] = int(map.turn)
-                                map.expand_left -= 1
+                            if (map.grid_event[i][j].collidepoint(mouse_pos) and map.expand_left > 0 and
+                                    map.field_owner[i][j] == 0):
+                                if (map.field_owner[i - 1][j] == map.turn or map.field_owner[i + 1][j] == map.turn or
+                                        map.field_owner[i][j - 1] == map.turn or map.field_owner[i][j + 1] == map.turn):
+                                    map.field_owner[i][j] = int(map.turn)
+                                    map.expand_left -= 1
 
-                map_update(map)
+                    map_update(map)
+                if event.button == 4:  # Scroll up
+                    handle_zoom_event(map, event)
+                elif event.button == 5:  # Scroll down
+                    if map.camera_zoom >= 0.1:
+                        handle_zoom_event(map, event)
 
             elif event.type == pygame.MOUSEMOTION:
                 mouse_pos = pygame.mouse.get_pos()
